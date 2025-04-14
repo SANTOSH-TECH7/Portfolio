@@ -1,0 +1,1534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Santosh R - AI & Data Science</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Orbitron:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.11.4/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #7e22ce;
+            --accent: #f59e0b;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --text-dark: #1e293b;
+            --text-light: #f1f5f9;
+            --card-bg-dark: rgba(15, 23, 42, 0.8);
+            --card-bg-light: rgba(248, 250, 252, 0.8);
+            --glass-dark: rgba(15, 23, 42, 0.7);
+            --glass-light: rgba(248, 250, 252, 0.7);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--dark);
+            color: var(--text-light);
+            overflow-x: hidden;
+            transition: background-color 0.5s ease;
+        }
+
+        body.light-mode {
+            background-color: var(--light);
+            color: var(--text-dark);
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .tech-tag {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 9999px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            display: inline-block;
+            margin: 0.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .tech-tag:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.5);
+        }
+
+        /* Custom cursor */
+        .cursor {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            mix-blend-mode: difference;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+        }
+
+        .cursor-dot {
+            width: 6px;
+            height: 6px;
+            background-color: var(--accent);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Particles container */
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        /* Hero section */
+        .hero-container {
+            min-height: 100vh;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hero-text {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+
+        .hero-text h1 {
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: inline-block;
+        }
+
+        .hero-text h2 {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            color: var(--accent);
+        }
+
+        /* 3D canvas for hero */
+        #hero-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        /* Section dividers */
+        .section-divider {
+            position: relative;
+            height: 150px;
+            margin: 2rem 0;
+        }
+
+        .divider-canvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Glassmorphism card design */
+        .glass-card {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            padding: 2rem;
+            transition: all 0.5s ease;
+        }
+
+        .dark .glass-card {
+            background-color: var(--glass-dark);
+        }
+
+        .light-mode .glass-card {
+            background-color: var(--glass-light);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        /* Project cards */
+        .project-card {
+            border-radius: 20px;
+            overflow: hidden;
+            perspective: 1000px;
+            transform-style: preserve-3d;
+            transition: transform 0.5s ease, box-shadow 0.5s ease;
+            margin-bottom: 2rem;
+            position: relative;
+            background-color: var(--card-bg-dark);
+        }
+
+        .light-mode .project-card {
+            background-color: var(--card-bg-light);
+        }
+
+        .project-card:hover {
+            transform: translateY(-10px) rotateX(5deg) rotateY(5deg);
+            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.25), 
+                        0 18px 36px -18px rgba(0, 0, 0, 0.3),
+                        0 -12px 36px -8px rgba(37, 99, 235, 0.2);
+        }
+
+        .project-image {
+            height: 250px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .project-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            transition: transform 0.5s ease;
+        }
+
+        .project-card:hover .project-image img {
+            transform: scale(1.05);
+        }
+
+        .project-content {
+            padding: 1.5rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .project-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--accent);
+        }
+
+        .project-description {
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .project-link {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border-radius: 9999px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin-top: 0.5rem;
+        }
+
+        .project-link:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.5);
+        }
+
+        .project-link i {
+            margin-right: 0.5rem;
+        }
+
+        /* Skill bars */
+        .skill-container {
+            margin-bottom: 1.5rem;
+        }
+
+        .skill-name {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .skill-percentage {
+            color: var(--accent);
+        }
+
+        .skill-bar {
+            height: 12px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 9999px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .skill-progress {
+            height: 100%;
+            border-radius: 9999px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            width: 0;
+            transition: width 1.5s ease;
+            position: relative;
+        }
+
+        .skill-progress::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0) 100%);
+            animation: shine 2s infinite linear;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Navigation */
+        .nav-item {
+            cursor: pointer;
+            position: relative;
+            padding: 0.5rem 1rem;
+            margin: 0 0.5rem;
+            color: var(--text-light);
+            transition: all 0.3s ease;
+        }
+
+        .light-mode .nav-item {
+            color: var(--text-dark);
+        }
+
+        .nav-item::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 2px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            transition: width 0.3s ease;
+        }
+
+        .nav-item:hover::after, .nav-item.active::after {
+            width: 80%;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            color: var(--accent);
+        }
+
+        /* Theme toggle */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        /* Social links */
+        .social-links {
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .social-link {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 0.5rem;
+            background-color: var(--primary);
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .social-link:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        }
+
+        /* Certification cards */
+        .certification-card {
+            padding: 1.5rem;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            background-color: var(--card-bg-dark);
+            margin-bottom: 1.5rem;
+        }
+
+        .light-mode .certification-card {
+            background-color: var(--card-bg-light);
+        }
+
+        .certification-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(transparent, var(--primary), transparent 30%);
+            opacity: 0;
+            animation: rotate 4s linear infinite;
+            transition: opacity 0.3s ease;
+        }
+
+        .certification-card:hover::before {
+            opacity: 1;
+        }
+
+        @keyframes rotate {
+            100% {
+                transform: rotate(1turn);
+            }
+        }
+
+        .certification-card::after {
+            content: '';
+            position: absolute;
+            inset: 3px;
+            border-radius: 12px;
+            background-color: var(--card-bg-dark);
+        }
+
+        .light-mode .certification-card::after {
+            background-color: var(--card-bg-light);
+        }
+
+        .certification-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Achievement cards */
+        .achievement-card {
+            padding: 1.5rem;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            background-color: var(--card-bg-dark);
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--accent);
+        }
+
+        .light-mode .achievement-card {
+            background-color: var(--card-bg-light);
+        }
+
+        .achievement-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .achievement-icon {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            font-size: 2.5rem;
+            color: rgba(255, 255, 255, 0.1);
+        }
+
+        .light-mode .achievement-icon {
+            color: rgba(0, 0, 0, 0.1);
+        }
+
+        /* Contact form */
+        .form-input {
+            width: 100%;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            color: var(--text-light);
+            transition: all 0.3s ease;
+        }
+
+        .light-mode .form-input {
+            background-color: rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            color: var(--text-dark);
+        }
+
+        .form-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px var(--primary);
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .light-mode .form-input:focus {
+            background-color: rgba(0, 0, 0, 0.08);
+        }
+
+        .submit-btn {
+            padding: 1rem 2rem;
+            border-radius: 9999px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.5);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .hero-text h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero-text h2 {
+                font-size: 1.5rem;
+            }
+            
+            .nav-container {
+                flex-direction: column;
+            }
+            
+            .nav-menu {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .nav-item {
+                margin: 0.3rem;
+            }
+        }
+    </style>
+</head>
+<body class="dark">
+    <!-- Custom cursor -->
+    <div class="cursor"></div>
+    <div class="cursor-dot"></div>
+
+    <!-- Particles background -->
+    <div id="particles-js"></div>
+
+    <!-- Theme toggle -->
+    <div class="theme-toggle" id="theme-toggle">
+        <i class="fas fa-sun text-xl"></i>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full top-0 z-50 glass-card bg-opacity-90 dark:bg-opacity-90" style="backdrop-filter: blur(10px);">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center nav-container">
+                <div class="text-2xl font-bold">
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">Santosh R</span>
+                </div>
+                <div class="flex nav-menu">
+                    <div class="nav-item" data-scroll="home">Home</div>
+                    <div class="nav-item" data-scroll="about">About</div>
+                    <div class="nav-item" data-scroll="skills">Skills</div>
+                    <div class="nav-item" data-scroll="achievements">Achievements</div>
+                    <div class="nav-item" data-scroll="projects">Projects</div>
+                    <div class="nav-item" data-scroll="certifications">Certifications</div>
+                    <div class="nav-item" data-scroll="contact">Contact</div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero section -->
+    <section id="home" class="hero-container">
+        <canvas id="hero-canvas"></canvas>
+        <div class="hero-text">
+            <h1 class="animate-text">Santosh R</h1>
+            <h2>AI & Data Science</h2>
+            <p class="text-xl mb-8 max-w-2xl mx-auto">Creating intelligent solutions through code and innovation</p>
+            <a href="#projects" class="project-link text-lg">
+                <i class="fas fa-code"></i> View My Work
+            </a>
+        </div>
+    </section>
+
+    <!-- About section -->
+    <section id="about" class="py-20">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold mb-16 text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">About Me</h2>
+            <div class="glass-card">
+                <div class="flex flex-col md:flex-row items-center">
+                    <div class="md:w-1/3 mb-8 md:mb-0">
+                        <div class="rounded-full h-64 w-64 mx-auto overflow-hidden border-4 border-blue-500">
+                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" class="w-full h-full object-cover bg-white" alt="Santosh R">
+                        </div>
+                    </div>
+                    <div class="md:w-2/3 md:pl-10">
+                        <h3 class="text-2xl font-bold mb-4">Hello, I'm Santosh R!</h3>
+                        <p class="mb-4 text-lg">I am currently pursuing Artificial Intelligence and Data Science at V.S.B Engineering College, Karur, where I also serve as the department representative.</p>
+                        <p class="mb-4 text-lg">My passion lies in developing intelligent applications that solve real-world problems. I specialize in AI technologies, machine learning, and full-stack development.</p>
+                        <p class="mb-4 text-lg">With a solid foundation in Python, JavaScript, and various frameworks, I build applications that are not only functional but also user-friendly and innovative.</p>
+                        
+                        <div class="flex flex-wrap mt-6">
+                            <div class="mr-8 mb-4">
+                                <h4 class="text-lg font-semibold mb-1">Education</h4>
+                                <p>V.S.B Engineering College, Karur</p>
+                                <p class="text-sm text-gray-400">B.Tech in AI & Data Science</p>
+                            </div>
+                            <div class="mr-8 mb-4">
+                                <h4 class="text-lg font-semibold mb-1">Role</h4>
+                                <p>Department Representative</p>
+                                <p class="text-sm text-gray-400">Student Leadership</p>
+                            </div>
+                            <div class="mb-4">
+                                <h4 class="text-lg font-semibold mb-1">Location</h4>
+                                <p>Karur, Tamil Nadu</p>
+                                <p class="text-sm text-gray-400">India</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3D Section Divider -->
+    <div class="section-divider">
+        <canvas class="divider-canvas" id="divider-1"></canvas>
+    </div>
+
+    <!-- Skills section -->
+    <section id="skills" class="py-20">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold mb-16 text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">Technical Skills</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <div class="glass-card">
+                    <h3 class="text-2xl font-bold mb-6 text-center">Programming Languages</h3>
+                    
+                    <div class="skill-container">
+                        <div class="skill-name">
+                            <span>Python</span>
+                            <span class="skill-percentage">95%</span>
+                        </div>
+                        <div class="skill-bar">
+                            <div class="skill-progress" data-width="95"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="skill-container">
+                        <div class="skill-name">
+                            <span>JavaScript</span>
+                            <span class="skill-percentage">85%</span>
+                        </div>
+                        <div class="skill-bar">
+                            <div class="skill-progress" data-width="85"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="skill-container">
+                        <div class="skill-name">
+                            <span>HTML & CSS</span>
+                            <span class="skill-percentage">90%</span>
+                        </div>
+                        <div class="skill-bar">
+                            <div class="skill-progress" data-width="90"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="skill-container">
+                        <div class="skill-name">
+                            <span>Java</span>
+                            <span class="skill-percentage">75%</span>
+                        </div>
+                        <div class="skill-bar">
+                            <div class="skill-progress" data-width="75"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="glass-card">
+                    <h3 class="text-2xl font-bold mb-6 text-center">Technologies & Frameworks</h3>
+                    
+                    <div class="skill-container">
+                        <div class="skill-name">
+                            <span>Machine Learning</span>
+                            <span class="skill-percentage">90%</span>
+                        </div>
+                        <div class="skill-bar">
+                            <div class="skill-progress" data-width="90"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="skill-container">
+                        <div class="skill-name">
+                            <span>TensorFlow & OpenCV</span>
+                            <span class="skill-percentage">85%</span>
+                        </div>
+                        <div class="skill-bar">
+                            <div class="skill-progress" data-width="85"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="skill-container">
+                        <div class="skill-name">
+                            <span>Flask & Django</span>
+                            <span class="skill-percentage">80%</span>
+                        </div>
+                        <div class="skill-bar">
+                            <div class="skill-progress" data-width="80"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="skill-container">
+                        <div class="skill-name">
+                            <span>Selenium & Automation</span>
+                            <span class="skill-percentage">88%</span>
+                        </div>
+                        <div class="skill-bar">
+                            <div class="skill-progress" data-width="88"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="glass-card mt-10">
+                <h3 class="text-2xl font-bold mb-6 text-center">Tools & Environments</h3>
+                
+                <div class="flex flex-wrap justify-center">
+                    <div class="tech-tag m-2 transform hover:scale-110 transition-transform">
+                        <i class="fab fa-github mr-1"></i> GitHub
+                    </div>
+                    <div class="tech-tag m-2 transform hover:scale-110 transition-transform">
+                        <i class="fab fa-python mr-1"></i> Jupyter
+                    </div>
+                    <div class="tech-tag m-2 transform hover:scale-110 transition-transform">
+                        <i class="fas fa-code mr-1"></i> VS Code
+                    </div>
+                    <div class="tech-tag m-2 transform hover:scale-110 transition-transform">
+                        <i class="fas fa-database mr-1"></i> SQL
+                    </div>
+                    <div class="tech-tag m-2 transform hover:scale-110 transition-transform">
+                        <i class="fab fa-docker mr-1"></i> Docker
+                    </div>
+                    <div class="tech-tag m-2 transform hover:scale-110 transition-transform">
+                        <i class="fab fa-aws mr-1"></i> AWS
+                    </div>
+                    <div class="tech-tag m-2 transform hover:scale-110 transition-transform">
+                        <i class="fab fa-react mr-1"></i> React
+                    </div>
+                    <div class="tech-tag m-2 transform hover:scale-110 transition-transform">
+                        <i class="fab fa-node-js mr-1"></i> Node.js
+                    </div>
+                    <div class="tech-tag m-2 transform hover:scale-110 transition-transform">
+                        <i class="fas fa-brain mr-1"></i> Scikit-Learn
+                    </div>
+                    <div class="tech-tag m-2 transform hover:scale-110 transition-transform">
+                        <i class="fas fa-robot mr-1"></i> Tkinter
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3D Section Divider -->
+    <div class="section-divider">
+        <canvas class="divider-canvas" id="divider-2"></canvas>
+    </div>
+
+    <!-- Achievements section -->
+    <section id="achievements" class="py-20">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold mb-16 text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">Achievements</h2>
+            
+            <div class="glass-card">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Achievement 1 -->
+                    <div class="achievement-card">
+                        <i class="fas fa-trophy achievement-icon"></i>
+                        <h3 class="text-xl font-bold mb-2 text-yellow-400">MSME National Competition</h3>
+                        <p class="mb-2 text-lg">Shortlisted in top 25 teams</p>
+                        <p>Recognized for innovative solutions in Sustainable Management and Development in Water FootPrint.</p>
+                    </div>
+                    
+                    <!-- Achievement 2 -->
+                    <div class="achievement-card">
+                        <i class="fas fa-medal achievement-icon"></i>
+                        <h3 class="text-xl font-bold mb-2 text-yellow-400">Competitions at Kongu Engineering College</h3>
+                        <p class="mb-2 text-lg">1st & 2nd Prize</p>
+                        <p>For AI-Powered Seizure Detection & Sustainable Fashion AI Solutions projects.</p>
+                    </div>
+                    
+                    <!-- Achievement 3 -->
+                    <div class="achievement-card">
+                        <i class="fas fa-certificate achievement-icon"></i>
+                        <h3 class="text-xl font-bold mb-2 text-yellow-400">Hands-On-Training</h3>
+                        <p class="mb-2 text-lg">LABView Tool & Its Applications</p>
+                        <p>Completed comprehensive training at PSG Engineering College.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3D Section Divider -->
+    <div class="section-divider">
+        <canvas class="divider-canvas" id="divider-3"></canvas>
+    </div>
+
+    <!-- Projects section -->
+    <section id="projects" class="py-20">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold mb-16 text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">Featured Projects</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Project 1: CodeFixPro -->
+                <div class="project-card">
+                    <div class="project-image">
+                        <img src="https://page.genspark.site/get_upload_url/bd60b9be7b617ab2f76ebbbed09138aefb801e118c34a4af7d414ec03b85601d/default/portfolio/codeFix.jpg" alt="CodeFixPro">
+                    </div>
+                    <div class="project-content">
+                        <h3 class="project-title">CodeFixPro</h3>
+                        <p class="project-description">
+                            An AI-driven tool for automatically detecting and suggesting fixes for coding errors. Built using Python and machine learning models to help developers quickly debug code and learn better practices.
+                        </p>
+                        <div class="flex flex-wrap mb-4">
+                            <span class="tech-tag">Python</span>
+                            <span class="tech-tag">Machine Learning</span>
+                            <span class="tech-tag">NLP</span>
+                            <span class="tech-tag">Code Analysis</span>
+                        </div>
+                        <a href="https://github.com/SANTOSH-TECH7/CodeFixPro" class="project-link" target="_blank">
+                            <i class="fab fa-github"></i> View on GitHub
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Project 2: LinkedIn_Bot -->
+                <div class="project-card">
+                    <div class="project-image">
+                        <img src="https://page.genspark.site/get_upload_url/bd60b9be7b617ab2f76ebbbed09138aefb801e118c34a4af7d414ec03b85601d/default/portfolio/LinkedInBot.jpg" alt="LinkedIn Bot">
+                    </div>
+                    <div class="project-content">
+                        <h3 class="project-title">LinkedIn_Bot</h3>
+                        <p class="project-description">
+                            A Python automation bot for LinkedIn using Selenium, capable of connecting with professionals, sending personalized messages, and enhancing professional networking at scale.
+                        </p>
+                        <div class="flex flex-wrap mb-4">
+                            <span class="tech-tag">Python</span>
+                            <span class="tech-tag">Selenium</span>
+                            <span class="tech-tag">Web Automation</span>
+                            <span class="tech-tag">Networking</span>
+                        </div>
+                        <a href="https://github.com/SANTOSH-TECH7/LinkedIn_Bot" class="project-link" target="_blank">
+                            <i class="fab fa-github"></i> View on GitHub
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Project 3: EPILEPSY-MODEL-TRAINING -->
+                <div class="project-card">
+                    <div class="project-image">
+                        <img src="https://page.genspark.site/get_upload_url/bd60b9be7b617ab2f76ebbbed09138aefb801e118c34a4af7d414ec03b85601d/default/portfolio/epilepsy.jpg" alt="Epilepsy Model">
+                    </div>
+                    <div class="project-content">
+                        <h3 class="project-title">EPILEPSY-MODEL-TRAINING</h3>
+                        <p class="project-description">
+                            Deep learning project focused on training a model to detect epileptic seizures using EEG data. Involves model optimization, evaluation metrics, and real-time application potential.
+                        </p>
+                        <div class="flex flex-wrap mb-4">
+                            <span class="tech-tag">Deep Learning</span>
+                            <span class="tech-tag">TensorFlow</span>
+                            <span class="tech-tag">EEG Analysis</span>
+                            <span class="tech-tag">Medical AI</span>
+                        </div>
+                        <a href="https://github.com/SANTOSH-TECH7/EPILEPSY-MODEL-TRAINING" class="project-link" target="_blank">
+                            <i class="fab fa-github"></i> View on GitHub
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Project 4: Smart-Attendance-System -->
+                <div class="project-card">
+                    <div class="project-image">
+                        <img src="https://page.genspark.site/get_upload_url/bd60b9be7b617ab2f76ebbbed09138aefb801e118c34a4af7d414ec03b85601d/default/portfolio/smartAttendance.jpg" alt="Smart Attendance System">
+                    </div>
+                    <div class="project-content">
+                        <h3 class="project-title">Smart-Attendance-System</h3>
+                        <p class="project-description">
+                            A face recognition-based attendance system using OpenCV and machine learning that marks and stores attendance efficiently, eliminating manual entry and improving accuracy.
+                        </p>
+                        <div class="flex flex-wrap mb-4">
+                            <span class="tech-tag">OpenCV</span>
+                            <span class="tech-tag">Python</span>
+                            <span class="tech-tag">Face Recognition</span>
+                            <span class="tech-tag">Database</span>
+                        </div>
+                        <a href="https://github.com/SANTOSH-TECH7/Smart-Attendance-System-Using-Face-Recognition" class="project-link" target="_blank">
+                            <i class="fab fa-github"></i> View on GitHub
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Project 5: Heart_Disease_Prediction -->
+                <div class="project-card">
+                    <div class="project-image">
+                        <img src="https://page.genspark.site/get_upload_url/bd60b9be7b617ab2f76ebbbed09138aefb801e118c34a4af7d414ec03b85601d/default/portfolio/heartdisease.jpg" alt="Heart Disease Prediction">
+                    </div>
+                    <div class="project-content">
+                        <h3 class="project-title">Heart_Disease_Prediction</h3>
+                        <p class="project-description">
+                            A machine learning model trained using logistic regression to predict the likelihood of heart disease using health indicators from medical datasets.
+                        </p>
+                        <div class="flex flex-wrap mb-4">
+                            <span class="tech-tag">Logistic Regression</span>
+                            <span class="tech-tag">Scikit-Learn</span>
+                            <span class="tech-tag">Data Analysis</span>
+                            <span class="tech-tag">Healthcare</span>
+                        </div>
+                        <a href="https://github.com/SANTOSH-TECH7/Heart_Disease_Prediction-using-LogisticRegression" class="project-link" target="_blank">
+                            <i class="fab fa-github"></i> View on GitHub
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Project 6: Task-Remainder-Automation -->
+                <div class="project-card">
+                    <div class="project-image">
+                        <img src="https://page.genspark.site/get_upload_url/bd60b9be7b617ab2f76ebbbed09138aefb801e118c34a4af7d414ec03b85601d/default/portfolio/taskautomation.jpg" alt="Task Reminder Automation">
+                    </div>
+                    <div class="project-content">
+                        <h3 class="project-title">Task-Remainder-Automation</h3>
+                        <p class="project-description">
+                            A Python automation script that reminds users of tasks at specified intervals using Tkinter and voice alerts — enhancing daily productivity.
+                        </p>
+                        <div class="flex flex-wrap mb-4">
+                            <span class="tech-tag">Python</span>
+                            <span class="tech-tag">Tkinter</span>
+                            <span class="tech-tag">Automation</span>
+                            <span class="tech-tag">Voice Alerts</span>
+                        </div>
+                        <a href="https://github.com/SANTOSH-TECH7/Task-Remainder-Automation" class="project-link" target="_blank">
+                            <i class="fab fa-github"></i> View on GitHub
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Project 7: Water_app -->
+                <div class="project-card">
+                    <div class="project-image">
+                        <img src="https://page.genspark.site/get_upload_url/bd60b9be7b617ab2f76ebbbed09138aefb801e118c34a4af7d414ec03b85601d/default/portfolio/waterbot.jpg" alt="Water App">
+                    </div>
+                    <div class="project-content">
+                        <h3 class="project-title">Water_app</h3>
+                        <p class="project-description">
+                            A complete water usage chatbot solution that calculates water footprints (blue, green, grey) based on user inputs. Built with Python backend, front-end integration, and includes fuzzy matching for optimal UX.
+                        </p>
+                        <div class="flex flex-wrap mb-4">
+                            <span class="tech-tag">Python</span>
+                            <span class="tech-tag">ChatBot</span>
+                            <span class="tech-tag">Fuzzy Matching</span>
+                            <span class="tech-tag">Web Integration</span>
+                        </div>
+                        <a href="https://github.com/SANTOSH-TECH7/Water_app" class="project-link" target="_blank">
+                            <i class="fab fa-github"></i> View on GitHub
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3D Section Divider -->
+    <div class="section-divider">
+        <canvas class="divider-canvas" id="divider-4"></canvas>
+    </div>
+
+    <!-- Certifications section -->
+    <section id="certifications" class="py-20">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold mb-16 text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">Certifications</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Certification 1 -->
+                <div class="certification-card">
+                    <div class="certification-content">
+                        <h3 class="text-xl font-bold mb-2">Internship on AI</h3>
+                        <p class="text-lg mb-2">Novi Tech R&D Private Limited</p>
+                        <p class="mb-4">Completed intensive training in AI algorithms, model development, and practical applications in real-world scenarios.</p>
+                        <div class="flex items-center">
+                            <i class="fas fa-award text-yellow-400 mr-2"></i>
+                            <span>Completed 2023</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Certification 2 -->
+                <div class="certification-card">
+                    <div class="certification-content">
+                        <h3 class="text-xl font-bold mb-2">Gemini AI Jarvis Workshop</h3>
+                        <p class="text-lg mb-2">LetsUpgrade</p>
+                        <p class="mb-4">Intensive hands-on workshop on building AI assistants using Google's Gemini AI technology and advanced NLP techniques.</p>
+                        <div class="flex items-center">
+                            <i class="fas fa-award text-yellow-400 mr-2"></i>
+                            <span>Completed 2024</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3D Section Divider -->
+    <div class="section-divider">
+        <canvas class="divider-canvas" id="divider-5"></canvas>
+    </div>
+
+    <!-- Contact section -->
+    <section id="contact" class="py-20">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold mb-16 text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">Get In Touch</h2>
+            
+            <div class="glass-card">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-6">Contact Me</h3>
+                        <p class="mb-8 text-lg">Have a project in mind or want to discuss a collaboration? Feel free to reach out to me through the form or my social media profiles.</p>
+                        
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center mr-4">
+                                <i class="fas fa-envelope text-white"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold">Email</h4>
+                                <p><a href="mailto:santoshravi.san.2004@gmail.com">santoshravi.san.2004@gmail.com</a></p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center mr-4">
+                                <i class="fas fa-map-marker-alt text-white"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold">Location</h4>
+                                <p>Karur, Tamil Nadu, India</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center mr-4">
+                                <i class="fas fa-university text-white"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold">University</h4>
+                                <p>V.S.B Engineering College, Karur</p>
+                            </div>
+                        </div>
+                        
+                        <div class="social-links mt-8">
+                            <a href="https://github.com/SANTOSH-TECH7" class="social-link" target="_blank">
+                                <i class="fab fa-github"></i>
+                            </a>
+                            <a href="https://linkedin.com/in/santoshr" class="social-link" target="_blank">
+                                <i class="fab fa-linkedin-in"></i>
+                            </a>
+                            <a href="mailto:santoshravi.san.2004@gmail.com" class="social-link">
+                                <i class="fas fa-envelope"></i>
+                            </a>
+                            <a href="https://twitter.com/santoshr" class="social-link" target="_blank">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <form id="contact-form" action="https://formspree.io/f/santoshravi.san.2004@gmail.com" method="POST">
+                            <div class="mb-4">
+                                <input type="text" name="name" placeholder="Your Name" class="form-input" required>
+                            </div>
+                            <div class="mb-4">
+                                <input type="email" name="email" placeholder="Your Email" class="form-input" required>
+                            </div>
+                            <div class="mb-4">
+                                <input type="text" name="subject" placeholder="Subject" class="form-input" required>
+                            </div>
+                            <div class="mb-6">
+                                <textarea name="message" rows="5" placeholder="Your Message" class="form-input" required></textarea>
+                            </div>
+                            <button type="submit" class="submit-btn">
+                                <i class="fas fa-paper-plane mr-2"></i> Send Message
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-8 glass-card">
+        <div class="container mx-auto px-4 text-center">
+            <p class="mb-4">&copy; 2024 Santosh R. All Rights Reserved.</p>
+            <p>AI & Full Stack Developer | V.S.B Engineering College</p>
+        </div>
+    </footer>
+
+    <script>
+        // Wait for the DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Particles.js
+            particlesJS('particles-js', {
+                "particles": {
+                    "number": {
+                        "value": 80,
+                        "density": {
+                            "enable": true,
+                            "value_area": 800
+                        }
+                    },
+                    "color": {
+                        "value": "#2563eb"
+                    },
+                    "shape": {
+                        "type": "circle",
+                        "stroke": {
+                            "width": 0,
+                            "color": "#000000"
+                        },
+                        "polygon": {
+                            "nb_sides": 5
+                        }
+                    },
+                    "opacity": {
+                        "value": 0.5,
+                        "random": false,
+                        "anim": {
+                            "enable": false,
+                            "speed": 1,
+                            "opacity_min": 0.1,
+                            "sync": false
+                        }
+                    },
+                    "size": {
+                        "value": 3,
+                        "random": true,
+                        "anim": {
+                            "enable": false,
+                            "speed": 40,
+                            "size_min": 0.1,
+                            "sync": false
+                        }
+                    },
+                    "line_linked": {
+                        "enable": true,
+                        "distance": 150,
+                        "color": "#2563eb",
+                        "opacity": 0.4,
+                        "width": 1
+                    },
+                    "move": {
+                        "enable": true,
+                        "speed": 2,
+                        "direction": "none",
+                        "random": false,
+                        "straight": false,
+                        "out_mode": "out",
+                        "bounce": false,
+                        "attract": {
+                            "enable": false,
+                            "rotateX": 600,
+                            "rotateY": 1200
+                        }
+                    }
+                },
+                "interactivity": {
+                    "detect_on": "canvas",
+                    "events": {
+                        "onhover": {
+                            "enable": true,
+                            "mode": "grab"
+                        },
+                        "onclick": {
+                            "enable": true,
+                            "mode": "push"
+                        },
+                        "resize": true
+                    },
+                    "modes": {
+                        "grab": {
+                            "distance": 140,
+                            "line_linked": {
+                                "opacity": 1
+                            }
+                        },
+                        "bubble": {
+                            "distance": 400,
+                            "size": 40,
+                            "duration": 2,
+                            "opacity": 8,
+                            "speed": 3
+                        },
+                        "repulse": {
+                            "distance": 200,
+                            "duration": 0.4
+                        },
+                        "push": {
+                            "particles_nb": 4
+                        },
+                        "remove": {
+                            "particles_nb": 2
+                        }
+                    }
+                },
+                "retina_detect": true
+            });
+
+            // Initialize 3D hero canvas
+            const heroCanvas = document.getElementById('hero-canvas');
+            const renderer = new THREE.WebGLRenderer({
+                canvas: heroCanvas,
+                antialias: true,
+                alpha: true
+            });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+
+            const scene = new THREE.Scene();
+            
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 30;
+
+            // Create a geometry
+            const sphereGeometry = new THREE.SphereGeometry(10, 32, 32);
+            
+            // Create material
+            const wireframeMaterial = new THREE.MeshBasicMaterial({
+                color: 0x2563eb,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.3
+            });
+            
+            // Create mesh
+            const sphere = new THREE.Mesh(sphereGeometry, wireframeMaterial);
+            scene.add(sphere);
+
+            // Add smaller floating spheres
+            const smallSpheres = [];
+            for (let i = 0; i < 20; i++) {
+                const radius = Math.random() * 0.5 + 0.3;
+                const smallSphereGeometry = new THREE.SphereGeometry(radius, 16, 16);
+                const smallSphereMaterial = new THREE.MeshBasicMaterial({
+                    color: 0x7e22ce,
+                    transparent: true,
+                    opacity: 0.7
+                });
+                
+                const smallSphere = new THREE.Mesh(smallSphereGeometry, smallSphereMaterial);
+                
+                // Position randomly around the main sphere
+                const angle1 = Math.random() * Math.PI * 2;
+                const angle2 = Math.random() * Math.PI * 2;
+                const distance = Math.random() * 10 + 10;
+                
+                smallSphere.position.x = Math.cos(angle1) * Math.sin(angle2) * distance;
+                smallSphere.position.y = Math.sin(angle1) * Math.sin(angle2) * distance;
+                smallSphere.position.z = Math.cos(angle2) * distance;
+                
+                // Store velocity for animation
+                smallSphere.userData.velocity = {
+                    x: (Math.random() - 0.5) * 0.05,
+                    y: (Math.random() - 0.5) * 0.05,
+                    z: (Math.random() - 0.5) * 0.05
+                };
+                
+                scene.add(smallSphere);
+                smallSpheres.push(smallSphere);
+            }
+
+            // Animation function
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                // Rotate main sphere
+                sphere.rotation.x += 0.005;
+                sphere.rotation.y += 0.005;
+                
+                // Animate small spheres
+                smallSpheres.forEach(smallSphere => {
+                    smallSphere.position.x += smallSphere.userData.velocity.x;
+                    smallSphere.position.y += smallSphere.userData.velocity.y;
+                    smallSphere.position.z += smallSphere.userData.velocity.z;
+                    
+                    // Bounce off an imaginary boundary
+                    const boundary = 15;
+                    ['x', 'y', 'z'].forEach(axis => {
+                        if (Math.abs(smallSphere.position[axis]) > boundary) {
+                            smallSphere.userData.velocity[axis] *= -1;
+                        }
+                    });
+                });
+                
+                renderer.render(scene, camera);
+            }
+            
+            animate();
+
+            // Create 3D section dividers
+            const dividers = ['divider-1', 'divider-2', 'divider-3', 'divider-4', 'divider-5'];
+            
+            dividers.forEach(id => {
+                const canvas = document.getElementById(id);
+                const renderer = new THREE.WebGLRenderer({
+                    canvas: canvas,
+                    antialias: true,
+                    alpha: true
+                });
+                renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+                
+                const scene = new THREE.Scene();
+                const camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
+                camera.position.z = 5;
+                
+                // Create a wavy plane geometry
+                const geometry = new THREE.PlaneGeometry(10, 2, 50, 10);
+                
+                // Modify vertices to create a wave
+                const positions = geometry.attributes.position.array;
+                for (let i = 0; i < positions.length; i += 3) {
+                    const x = positions[i];
+                    positions[i + 2] = Math.sin(x * 2) * 0.3;
+                }
+                
+                // Create material
+                const material = new THREE.MeshBasicMaterial({
+                    color: 0x2563eb,
+                    wireframe: true,
+                    transparent: true,
+                    opacity: 0.5
+                });
+                
+                const plane = new THREE.Mesh(geometry, material);
+                scene.add(plane);
+                
+                // Animation for this divider
+                function animateDivider() {
+                    requestAnimationFrame(animateDivider);
+                    
+                    // Update wave animation
+                    const positions = geometry.attributes.position.array;
+                    const time = Date.now() * 0.001;
+                    
+                    for (let i = 0; i < positions.length; i += 3) {
+                        const x = positions[i];
+                        positions[i + 2] = Math.sin(x * 2 + time) * 0.3;
+                    }
+                    
+                    geometry.attributes.position.needsUpdate = true;
+                    
+                    renderer.render(scene, camera);
+                }
+                
+                animateDivider();
+            });
+
+            // Custom cursor
+            const cursor = document.querySelector('.cursor');
+            const cursorDot = document.querySelector('.cursor-dot');
+            
+            document.addEventListener('mousemove', e => {
+                gsap.to(cursor, {
+                    x: e.clientX,
+                    y: e.clientY,
+                    duration: 0.15
+                });
+                
+                gsap.to(cursorDot, {
+                    x: e.clientX,
+                    y: e.clientY,
+                    duration: 0.1
+                });
+            });
+
+            // Theme toggle
+            const themeToggle = document.getElementById('theme-toggle');
+            const body = document.body;
+            
+            themeToggle.addEventListener('click', () => {
+                body.classList.toggle('light-mode');
+                
+                if (body.classList.contains('light-mode')) {
+                    themeToggle.innerHTML = '<i class="fas fa-moon text-xl"></i>';
+                } else {
+                    themeToggle.innerHTML = '<i class="fas fa-sun text-xl"></i>';
+                }
+            });
+
+            // Animate skill bars on scroll
+            const skillBars = document.querySelectorAll('.skill-progress');
+            
+            function animateSkillBars() {
+                skillBars.forEach(bar => {
+                    const width = bar.getAttribute('data-width');
+                    bar.style.width = width + '%';
+                });
+            }
+            
+            // Trigger skill bar animation when in viewport
+            const skillsSection = document.getElementById('skills');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        animateSkillBars();
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.2 });
+            
+            observer.observe(skillsSection);
+
+            // Navigation scroll
+            const navItems = document.querySelectorAll('.nav-item');
+            
+            navItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const targetId = item.getAttribute('data-scroll');
+                    const targetSection = document.getElementById(targetId);
+                    
+                    window.scrollTo({
+                        top: targetSection.offsetTop,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Update active state
+                    navItems.forEach(navItem => navItem.classList.remove('active'));
+                    item.classList.add('active');
+                });
+            });
+
+            // Update active nav item on scroll
+            function updateActiveNavItem() {
+                const scrollPosition = window.scrollY;
+                
+                document.querySelectorAll('section').forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.clientHeight;
+                    
+                    if (scrollPosition >= sectionTop - 100 && scrollPosition < sectionTop + sectionHeight - 100) {
+                        const id = section.getAttribute('id');
+                        
+                        navItems.forEach(item => {
+                            item.classList.remove('active');
+                            if (item.getAttribute('data-scroll') === id) {
+                                item.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }
+            
+            window.addEventListener('scroll', updateActiveNavItem);
+            
+            // Initialize first active nav item
+            navItems[0].classList.add('active');
+
+            // Animate hero text with GSAP
+            gsap.from('.animate-text', {
+                duration: 1.5,
+                opacity: 0,
+                y: 50,
+                ease: 'power3.out'
+            });
+
+            // Window resize handler
+            window.addEventListener('resize', () => {
+                // Update hero canvas
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                
+                // Update divider canvases
+                dividers.forEach(id => {
+                    const canvas = document.getElementById(id);
+                    const renderer = canvas.renderer;
+                    
+                    if (renderer) {
+                        const camera = canvas.camera;
+                        
+                        camera.aspect = canvas.clientWidth / canvas.clientHeight;
+                        camera.updateProjectionMatrix();
+                        renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+                    }
+                });
+            });
+
+            // Handle form submission
+            const contactForm = document.getElementById('contact-form');
+            contactForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(contactForm);
+                const name = formData.get('name');
+                const email = formData.get('email');
+                const subject = formData.get('subject');
+                const message = formData.get('message');
+                
+                // Email validation
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    alert('Please enter a valid email address');
+                    return;
+                }
+                
+                // Create mailto link with form data
+                const mailtoLink = `mailto:santoshravi.san.2004@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent('Name: ' + name + '\nEmail: ' + email + '\n\n' + message)}`;
+                
+                // Open email client
+                window.location.href = mailtoLink;
+                
+                // Reset form
+                contactForm.reset();
+                
+                // Show success message
+                alert('Thank you for your message! Your email client should open shortly to send the message directly to Santosh.');
+            });
+        });
+    </script>
+</body>
+</html>
