@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Manage Certifications</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@400;500&display=swap" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet"/>
+</head>
+<body>
+<nav class="navbar glass-nav px-4 py-3">
+  <span class="navbar-brand gradient-text fw-bold" style="font-family:'Orbitron',sans-serif;">Manage Certifications</span>
+  <div class="d-flex gap-3">
+    <a href="/dashboard" class="btn btn-sm btn-outline-light">← Dashboard</a>
+  </div>
+</nav>
+<div class="container py-5">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}
+    <div class="alert alert-{{ cat }} py-2 small">{{ msg }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  <div class="row g-4">
+    <div class="col-lg-5">
+      <div class="glass-card p-4">
+        <h5 class="gradient-text fw-bold mb-4">Add Certification</h5>
+        <form method="POST">
+          <div class="mb-3">
+            <label class="form-label small" style="color:var(--text-muted)">Name</label>
+            <input type="text" name="name" class="form-control dark-input" required/>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small" style="color:var(--text-muted)">Platform / Institute</label>
+            <input type="text" name="platform" class="form-control dark-input"/>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small" style="color:var(--text-muted)">Duration</label>
+            <input type="text" name="duration" class="form-control dark-input" placeholder="e.g. 3 months"/>
+          </div>
+          <div class="mb-4">
+            <label class="form-label small" style="color:var(--text-muted)">Start Date</label>
+            <input type="date" name="start_date" class="form-control dark-input"/>
+          </div>
+          <button type="submit" class="btn btn-glow w-100">Add Certification</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="col-lg-7">
+      {% for c in certifications %}
+      <div class="glass-card p-4 mb-3">
+        <form method="POST" action="/edit-certification/{{ c.id }}">
+          <div class="row g-2 mb-2">
+            <div class="col-md-6">
+              <input type="text" name="name" class="form-control dark-input form-control-sm" value="{{ c.name }}" required/>
+            </div>
+            <div class="col-md-6">
+              <input type="text" name="platform" class="form-control dark-input form-control-sm" value="{{ c.platform or '' }}" placeholder="Platform"/>
+            </div>
+            <div class="col-md-4">
+              <input type="text" name="duration" class="form-control dark-input form-control-sm" value="{{ c.duration or '' }}" placeholder="Duration"/>
+            </div>
+            <div class="col-md-4">
+              <input type="date" name="start_date" class="form-control dark-input form-control-sm" value="{{ c.start_date or '' }}"/>
+            </div>
+            <div class="col-md-4 d-flex gap-2">
+              <button type="submit" class="btn btn-sm btn-outline-primary flex-fill">Save</button>
+              <a href="/delete-certification/{{ c.id }}" class="btn btn-sm btn-outline-danger flex-fill" onclick="return confirm('Delete?')">Del</a>
+            </div>
+          </div>
+        </form>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

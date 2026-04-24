@@ -1,0 +1,434 @@
+{# ── DRIVE URL CONVERTER MACRO ─────────────────────────────────
+   Pass any URL. If it's a Google Drive share link, returns the
+   direct thumbnail/embed URL. Otherwise returns the URL unchanged.
+   Usage: {{ drive_img(some_url) }}
+#}
+{% macro drive_img(url, size='w800') %}
+  {%- if url and 'drive.google.com' in url -%}
+    {%- if '/file/d/' in url -%}
+      {%- set fid = url.split('/file/d/')[1].split('/')[0] -%}
+      https://drive.google.com/thumbnail?id={{ fid }}&sz={{ size }}
+    {%- elif 'id=' in url -%}
+      {%- set fid = url.split('id=')[1].split('&')[0] -%}
+      https://drive.google.com/thumbnail?id={{ fid }}&sz={{ size }}
+    {%- else -%}
+      {{ url }}
+    {%- endif -%}
+  {%- else -%}
+    {{ url }}
+  {%- endif -%}
+{% endmacro %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{{ person.name }} — Portfolio</title>
+  <meta name="description" content="{{ person.summary }}"/>
+  <meta property="og:title" content="{{ person.name }} — Portfolio"/>
+  <meta property="og:description" content="{{ person.summary }}"/>
+  {% if person.profile_image_url %}<meta property="og:image" content="{{ drive_img(person.profile_image_url) }}"/>{% endif %}
+  <meta property="og:type" content="website"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%232563eb'/><text y='.9em' font-size='55' font-family='Arial' font-weight='bold' fill='white' x='50%' text-anchor='middle'>SR</text></svg>"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet"/>
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet"/>
+  <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet"/>
+</head>
+<body>
+
+<div id="scroll-progress"></div>
+<div class="cursor"></div>
+<div class="cursor-dot"></div>
+<div id="particles-js"></div>
+
+<!-- THEME TOGGLE -->
+<div id="theme-toggle" style="position:fixed;top:20px;right:20px;z-index:1000;width:44px;height:44px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 16px rgba(37,99,235,0.4);">
+  <i class="fas fa-sun" style="color:#fff;"></i>
+</div>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg fixed-top glass-nav" id="mainNav">
+  <div class="container">
+    <a class="navbar-brand fw-bold gradient-text" href="#" style="font-family:'Orbitron',sans-serif;">{{ person.name }}</a>
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+      <i class="fas fa-bars" style="color:var(--text)"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto align-items-center gap-1">
+        <li class="nav-item"><a class="nav-link nav-link-item" href="#about" data-section="about">About</a></li>
+        <li class="nav-item"><a class="nav-link nav-link-item" href="#skills" data-section="skills">Skills</a></li>
+        <li class="nav-item"><a class="nav-link nav-link-item" href="#achievements" data-section="achievements">Achievements</a></li>
+        <li class="nav-item"><a class="nav-link nav-link-item" href="#projects" data-section="projects">Projects</a></li>
+        <li class="nav-item"><a class="nav-link nav-link-item" href="#education" data-section="education">Education</a></li>
+        <li class="nav-item"><a class="nav-link nav-link-item" href="#certifications" data-section="certifications">Certifications</a></li>
+        <li class="nav-item"><a class="nav-link nav-link-item" href="#contact" data-section="contact">Contact</a></li>
+        <li class="nav-item ms-2">
+          <a class="btn btn-glow btn-sm px-3" href="/resume">
+            <i class="fas fa-download me-1"></i>Resume
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="home" class="hero-section d-flex align-items-center">
+  <canvas id="hero-canvas"></canvas>
+  <!-- floating geo shapes -->
+  <div class="geo-shape hex" style="top:15%;right:8%;"></div>
+  <div class="geo-shape tri" style="bottom:20%;right:15%;"></div>
+  <div class="geo-shape diamond" style="top:60%;left:5%;"></div>
+  <div class="container hero-content">
+    <div class="row align-items-center">
+      <div class="col-lg-7" data-aos="fade-right">
+        <p style="color:var(--accent);letter-spacing:2px;text-transform:uppercase;font-size:0.9rem;">Hi, I'm</p>
+        <h1 class="hero-name mb-2">{{ person.name }}</h1>
+        <h2 class="hero-role mb-3"><span id="typed-role"></span></h2>
+        <p class="hero-summary mb-4">{{ person.summary }}</p>
+        <div class="d-flex flex-wrap gap-3 mb-4">
+          <a href="#projects" class="btn btn-glow px-4 py-2"><i class="fas fa-code me-2"></i>View Projects</a>
+          <a href="/resume" class="btn btn-outline-accent px-4 py-2"><i class="fas fa-download me-2"></i>Resume</a>
+          <a href="#contact" class="btn btn-outline-light px-4 py-2"><i class="fas fa-envelope me-2"></i>Contact</a>
+        </div>
+        <div class="d-flex gap-3 flex-wrap">
+          {% if socials.github %}
+          <a href="{{ socials.github }}" target="_blank" class="social-icon"><i class="fab fa-github"></i></a>
+          {% endif %}
+          {% if socials.linkedin %}
+          <a href="{{ socials.linkedin }}" target="_blank" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+          {% endif %}
+          {% if socials.leetcode %}
+          <a href="{{ socials.leetcode }}" target="_blank" class="social-icon" title="LeetCode">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M13.483 0a1.374 1.374 0 0 0-.961.438L7.116 6.226l-3.854 4.126a5.266 5.266 0 0 0-1.209 2.104 5.35 5.35 0 0 0-.125.513 5.527 5.527 0 0 0 .062 2.362 5.83 5.83 0 0 0 .349 1.017 5.938 5.938 0 0 0 1.271 1.818l4.277 4.193.039.038c2.248 2.165 5.852 2.133 8.063-.074l2.396-2.392c.54-.54.54-1.414.003-1.955a1.378 1.378 0 0 0-1.951-.003l-2.396 2.392a3.021 3.021 0 0 1-4.205.038l-.02-.019-4.276-4.193c-.652-.64-.972-1.469-.948-2.263a2.68 2.68 0 0 1 .066-.523 2.545 2.545 0 0 1 .619-1.164L9.13 8.114c1.058-1.134 3.204-1.27 4.43-.278l3.501 2.831c.593.48 1.461.387 1.94-.207a1.384 1.384 0 0 0-.207-1.943l-3.5-2.831c-.8-.647-1.766-1.045-2.774-1.202l2.015-2.158A1.384 1.384 0 0 0 13.483 0zm-2.866 12.815a1.38 1.38 0 0 0-1.38 1.382 1.38 1.38 0 0 0 1.38 1.382H20.79a1.38 1.38 0 0 0 1.38-1.382 1.38 1.38 0 0 0-1.38-1.382z"/></svg>
+          </a>
+          {% endif %}
+          {% if socials.hackerrank %}
+          <a href="{{ socials.hackerrank }}" target="_blank" class="social-icon"><i class="fab fa-hackerrank"></i></a>
+          {% endif %}
+          {% for e in emails %}
+          <a href="mailto:{{ e.email }}" class="social-icon"><i class="fas fa-envelope"></i></a>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="col-lg-5 text-center mt-5 mt-lg-0" data-aos="fade-left">
+        <div class="avatar-ring">
+          <img src="{{ drive_img(person.profile_image_url) or url_for('static', filename='images/profile.jpeg') }}"
+               alt="{{ person.name }}" class="hero-avatar"
+               onerror="this.src='https://ui-avatars.com/api/?name={{ person.name }}&background=2563eb&color=fff&size=300'"/>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TECH MARQUEE -->
+<div class="marquee-strip py-3">
+  <div class="marquee-track">
+    {% set techs = ["Python","Machine Learning","TensorFlow","OpenCV","Flask","Django","Selenium","JavaScript","HTML & CSS","Java","Scikit-Learn","SQL","Docker","AWS","React","Node.js","Tkinter","NLP","Deep Learning","Computer Vision"] %}
+    {% for t in techs %}<span class="marquee-item">{{ t }}</span>{% endfor %}
+    {% for t in techs %}<span class="marquee-item">{{ t }}</span>{% endfor %}
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about" class="section-pad">
+  <div class="container">
+    <h2 class="section-title" data-aos="fade-up">About Me</h2>
+    <div class="glass-card p-4 p-lg-5" data-aos="fade-up" data-aos-delay="100">
+      <div class="row align-items-center">
+        <div class="col-lg-4 text-center mb-4 mb-lg-0">
+          <img src="{{ drive_img(person.profile_image_url) or url_for('static', filename='images/profile.jpeg') }}"
+               alt="{{ person.name }}" class="about-img"
+               onerror="this.src='https://ui-avatars.com/api/?name={{ person.name }}&background=2563eb&color=fff&size=300'"/>
+        </div>
+        <div class="col-lg-8">
+          <h3 class="fw-bold mb-3">Hello, I'm <span class="gradient-text">{{ person.name }}</span>!</h3>
+          <p style="color:var(--text-muted);line-height:1.8;" class="mb-4">{{ person.summary }}</p>
+          <div class="row g-3 mb-4">
+            <div class="col-6 col-md-3"><div class="stat-card text-center p-3"><div class="stat-num">1+</div><div class="stat-label">Years Exp</div></div></div>
+            <div class="col-6 col-md-3"><div class="stat-card text-center p-3"><div class="stat-num">15+</div><div class="stat-label">Skills</div></div></div>
+            <div class="col-6 col-md-3"><div class="stat-card text-center p-3"><div class="stat-num">{{ projects|length }}</div><div class="stat-label">Projects</div></div></div>
+            <div class="col-6 col-md-3"><div class="stat-card text-center p-3"><div class="stat-num">{{ education|length }}</div><div class="stat-label">Degrees</div></div></div>
+          </div>
+          <div class="d-flex flex-wrap gap-2">
+            {% for ss in soft_skills %}<span class="badge-soft">{{ ss.name }}</span>{% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"><canvas class="divider-canvas" id="div1"></canvas></div>
+
+<!-- SKILLS -->
+<section id="skills" class="section-pad">
+  <div class="container" style="position:relative;">
+    <div class="geo-shape tri" style="top:8%;left:2%;"></div>
+    <div class="geo-shape hex" style="bottom:5%;right:3%;width:55px;height:55px;"></div>
+    <h2 class="section-title" data-aos="fade-up">Technical Skills</h2>
+    <div class="skills-star-grid">
+      {% for cat in skills %}
+      <div class="star-schema-wrap" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 120 }}">
+        <div class="star-hub">
+          <span class="star-hub-label">{{ cat.name }}</span>
+        </div>
+        <div class="star-spokes" data-count="{{ cat.skills | length }}">
+          {% for skill in cat.skills %}
+          <div class="star-spoke-item" style="--i:{{ loop.index0 }};--total:{{ cat.skills | length }};">
+            <div class="star-spoke-line"></div>
+            <div class="star-node" title="{{ skill.percentage }}%">
+              <span class="star-node-label">{{ skill.name }}</span>
+              <div class="star-node-bar">
+                <div class="star-node-fill" data-width="{{ skill.percentage }}"></div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"><canvas class="divider-canvas" id="div2"></canvas></div>
+
+<!-- ACHIEVEMENTS -->
+{% if achievements %}
+<section id="achievements" class="section-pad">
+  <div class="container">
+    <h2 class="section-title" data-aos="fade-up">Achievements</h2>
+    <div class="glass-card p-4 p-lg-5" data-aos="fade-up">
+      <div class="row g-4">
+        {% for ach in achievements %}
+        <div class="col-md-6">
+          <div class="achievement-card">
+            <i class="{{ ach.icon }} achievement-icon"></i>
+            <h5 class="fw-bold mb-1" style="color:var(--accent)">{{ ach.title }}</h5>
+            {% if ach.subtitle %}<p class="mb-2" style="font-size:0.95rem;">{{ ach.subtitle }}</p>{% endif %}
+            {% if ach.description %}<p style="color:var(--text-muted);font-size:0.88rem;">{{ ach.description }}</p>{% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+<div class="section-divider"><canvas class="divider-canvas" id="div3"></canvas></div>
+{% endif %}
+
+<!-- EXPERIENCE -->
+{% if experience %}
+<section id="experience" class="section-pad">
+  <div class="container">
+    <h2 class="section-title" data-aos="fade-up">Experience</h2>
+    <div class="timeline">
+      {% for exp in experience %}
+      <div class="timeline-item" data-aos="fade-up">
+        <div class="timeline-dot"></div>
+        <div class="glass-card p-4 ms-4">
+          <div class="d-flex justify-content-between flex-wrap mb-2">
+            <h5 class="fw-bold gradient-text mb-0">{{ exp.role }}</h5>
+            <span class="badge-category">{{ exp.start_year or '' }}{% if exp.end_year %} – {{ exp.end_year }}{% else %} – Present{% endif %}</span>
+          </div>
+          <p style="color:var(--accent);font-weight:600;" class="mb-3">{{ exp.company }}</p>
+          <ul class="list-unstyled mb-3">
+            {% for r in exp.responsibilities %}
+            <li class="mb-1" style="color:var(--text-muted);font-size:0.9rem;"><i class="fas fa-chevron-right me-2" style="color:var(--primary);font-size:0.7rem;"></i>{{ r.description }}</li>
+            {% endfor %}
+          </ul>
+          <div class="d-flex flex-wrap gap-2">
+            {% for t in exp.technologies %}<span class="tech-tag">{{ t.name }}</span>{% endfor %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+<div class="section-divider"><canvas class="divider-canvas" id="div4"></canvas></div>
+{% endif %}
+
+<!-- PROJECTS -->
+<section id="projects" class="section-pad">
+  <div class="container" style="position:relative;">
+    <div class="geo-shape hex" style="top:5%;right:2%;width:60px;height:60px;"></div>
+    <div class="geo-shape diamond" style="bottom:10%;left:1%;"></div>
+    <h2 class="section-title" data-aos="fade-up">Featured Projects</h2>
+    <!-- Filter Tabs -->
+    <div class="d-flex flex-wrap justify-content-center gap-2 mb-5" data-aos="fade-up">
+      <button class="btn btn-sm btn-glow filter-btn active" data-filter="all">All</button>
+      <button class="btn btn-sm btn-outline-light filter-btn" data-filter="AI">AI / ML</button>
+      <button class="btn btn-sm btn-outline-light filter-btn" data-filter="Automation">Automation</button>
+      <button class="btn btn-sm btn-outline-light filter-btn" data-filter="Web">Web</button>
+      <button class="btn btn-sm btn-outline-light filter-btn" data-filter="Vision">Computer Vision</button>
+    </div>
+    <div class="row g-4">
+      {% for project in projects %}
+      <div class="col-lg-4 col-md-6 project-item" data-category="{{ project.category }}" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 80 }}">
+        <div class="project-card h-100 d-flex flex-column">
+          <div class="project-img">
+            <img src="{{ drive_img(project.image_url) or 'https://via.placeholder.com/400x200/0f172a/2563eb?text=' + project.title }}"
+                 alt="{{ project.title }}"
+                 onerror="this.src='https://via.placeholder.com/400x200/0f172a/2563eb?text=Project'"/>
+            <div class="project-img-overlay"></div>
+          </div>
+          <div class="p-4 d-flex flex-column flex-grow-1">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <span class="badge-category">{{ project.category or 'Project' }}</span>
+              {% for m in project.metrics %}<span class="badge-metric">{{ m.metric_name }}: {{ m.value }}</span>{% endfor %}
+            </div>
+            <h5 class="fw-bold mb-2">{{ project.title }}</h5>
+            <p style="color:var(--text-muted);font-size:0.88rem;" class="flex-grow-1">{{ project.description }}</p>
+            <div class="d-flex flex-wrap gap-1 my-3">
+              {% for t in project.tools %}<span class="tech-tag">{{ t.name }}</span>{% endfor %}
+            </div>
+            <div class="d-flex gap-2 mt-auto">
+              {% if project.github_url %}
+              <a href="{{ project.github_url }}" target="_blank" class="btn btn-sm btn-outline-light flex-fill">
+                <i class="fab fa-github me-1"></i>GitHub
+              </a>
+              {% endif %}
+              {% if project.demo_url %}
+              <a href="{{ project.demo_url }}" target="_blank" class="btn btn-sm btn-glow flex-fill">
+                <i class="fas fa-external-link-alt me-1"></i>Demo
+              </a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"><canvas class="divider-canvas" id="div5"></canvas></div>
+
+<!-- EDUCATION -->
+<section id="education" class="section-pad">
+  <div class="container">
+    <h2 class="section-title" data-aos="fade-up">Education Roadmap</h2>
+    <div class="edu-roadmap-wrap" data-aos="fade-up">
+      {% set edu_list = education | sort(attribute='sort_order') %}
+      {% for edu in edu_list %}
+      <div class="edu-node glass-card p-4 text-center" data-aos="zoom-in" data-aos-delay="{{ loop.index0 * 150 }}">
+        <div class="edu-step-num">{{ loop.index }}</div>
+        <div class="edu-icon-wrap mb-2">
+          <i class="fas fa-graduation-cap"></i>
+        </div>
+        <h6 class="fw-bold mb-1">{{ edu.degree }}</h6>
+        <p class="edu-institution mb-1">{{ edu.institution }}</p>
+        {% if edu.place %}<p class="edu-place mb-1"><i class="fas fa-map-marker-alt me-1"></i>{{ edu.place }}</p>{% endif %}
+        <div class="d-flex flex-wrap justify-content-center gap-1 mt-2">
+          {% if edu.percentage %}<span class="badge-metric">{{ edu.percentage }}</span>{% endif %}
+          {% if edu.year %}<span class="badge-category">{{ edu.year }}</span>{% endif %}
+          {% if edu.status %}<span class="edu-status-badge">{{ edu.status }}</span>{% endif %}
+        </div>
+      </div>
+      {% if not loop.last %}
+      <div class="edu-connector">
+        <div class="edu-connector-line"></div>
+        <div class="edu-connector-arrow"><i class="fas fa-chevron-right"></i></div>
+      </div>
+      {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"><canvas class="divider-canvas" id="div6"></canvas></div>
+
+<!-- CERTIFICATIONS -->
+<section id="certifications" class="section-pad">
+  <div class="container">
+    <h2 class="section-title" data-aos="fade-up">Certifications</h2>
+    <div class="row g-4 justify-content-center">
+      {% for cert in certifications %}
+      <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+        <div class="cert-card glass-card p-4 text-center h-100">
+          <div class="cert-content">
+            {% if cert.certificate_image_url %}
+            <div class="cert-img-wrap mb-3">
+              <img src="{{ drive_img(cert.certificate_image_url) }}" alt="{{ cert.name }}" class="cert-badge-img"
+                   onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/>
+              <div style="display:none;font-size:2rem;color:#a78bfa;"><i class="fas fa-award"></i></div>
+            </div>
+            {% else %}
+            <div style="font-size:2rem;color:#a78bfa;margin-bottom:0.75rem;"><i class="fas fa-award"></i></div>
+            {% endif %}
+            <h6 class="fw-bold mb-2">{{ cert.name }}</h6>
+            <p style="color:var(--text-muted);font-size:0.85rem;" class="mb-1">{{ cert.platform }}</p>
+            {% if cert.duration %}<p style="color:var(--accent);font-size:0.82rem;">{{ cert.duration }}</p>{% endif %}
+            {% if cert.start_date %}<p style="color:var(--text-muted);font-size:0.78rem;">{{ cert.start_date }}</p>{% endif %}
+            {% if cert.certificate_image_url %}
+              {%- set _raw = cert.certificate_image_url -%}
+              {%- if 'drive.google.com' in _raw and '/file/d/' in _raw -%}
+                {%- set _fid = _raw.split('/file/d/')[1].split('/')[0] -%}
+                {%- set _view = 'https://drive.google.com/file/d/' + _fid + '/view' -%}
+              {%- else -%}
+                {%- set _view = _raw -%}
+              {%- endif -%}
+            <a href="{{ _view }}" target="_blank" class="btn btn-sm btn-outline-accent mt-2">
+              <i class="fas fa-external-link-alt me-1"></i>View Certificate
+            </a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"><canvas class="divider-canvas" id="div7"></canvas></div>
+
+<!-- CONTACT -->
+<section id="contact" class="section-pad">
+  <div class="container">
+    <div class="contact-cta glass-card p-5 text-center" data-aos="fade-up">
+      <h2 class="gradient-text mb-3">Let's Build Something Great Together</h2>
+      <p style="color:var(--text-muted);" class="mb-4">Open to AI, Data Science, and Full Stack opportunities.</p>
+      <div class="d-flex flex-wrap justify-content-center gap-3">
+        {% for e in emails %}
+        <a href="mailto:{{ e.email }}" class="btn btn-glow px-4"><i class="fas fa-envelope me-2"></i>{{ e.email }}</a>
+        {% endfor %}
+        {% if socials.linkedin %}
+        <a href="{{ socials.linkedin }}" target="_blank" class="btn btn-outline-accent px-4"><i class="fab fa-linkedin-in me-2"></i>LinkedIn</a>
+        {% endif %}
+        {% if socials.github %}
+        <a href="{{ socials.github }}" target="_blank" class="btn btn-outline-light px-4"><i class="fab fa-github me-2"></i>GitHub</a>
+        {% endif %}
+        {% if socials.leetcode %}
+        <a href="{{ socials.leetcode }}" target="_blank" class="btn btn-outline-light px-4">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="me-2"><path d="M13.483 0a1.374 1.374 0 0 0-.961.438L7.116 6.226l-3.854 4.126a5.266 5.266 0 0 0-1.209 2.104 5.35 5.35 0 0 0-.125.513 5.527 5.527 0 0 0 .062 2.362 5.83 5.83 0 0 0 .349 1.017 5.938 5.938 0 0 0 1.271 1.818l4.277 4.193.039.038c2.248 2.165 5.852 2.133 8.063-.074l2.396-2.392c.54-.54.54-1.414.003-1.955a1.378 1.378 0 0 0-1.951-.003l-2.396 2.392a3.021 3.021 0 0 1-4.205.038l-.02-.019-4.276-4.193c-.652-.64-.972-1.469-.948-2.263a2.68 2.68 0 0 1 .066-.523 2.545 2.545 0 0 1 .619-1.164L9.13 8.114c1.058-1.134 3.204-1.27 4.43-.278l3.501 2.831c.593.48 1.461.387 1.94-.207a1.384 1.384 0 0 0-.207-1.943l-3.5-2.831c-.8-.647-1.766-1.045-2.774-1.202l2.015-2.158A1.384 1.384 0 0 0 13.483 0zm-2.866 12.815a1.38 1.38 0 0 0-1.38 1.382 1.38 1.38 0 0 0 1.38 1.382H20.79a1.38 1.38 0 0 0 1.38-1.382 1.38 1.38 0 0 0-1.38-1.382z"/></svg>LeetCode
+        </a>
+        {% endif %}
+        {% if socials.hackerrank %}
+        <a href="{{ socials.hackerrank }}" target="_blank" class="btn btn-outline-light px-4"><i class="fab fa-hackerrank me-2"></i>HackerRank</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer text-center py-4">
+  <p style="color:var(--text-muted);" class="mb-1">© Designed & built by <span class="gradient-text fw-semibold">{{ person.name }}</span> — powered by Flask & Supabase.</p>
+  <a href="/login" style="color:var(--text-muted);font-size:0.75rem;opacity:0.25;">Admin</a>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.11.4/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12/dist/typed.umd.js"></script>
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

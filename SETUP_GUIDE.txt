@@ -1,0 +1,452 @@
+================================================================
+SANTOSH R — PORTFOLIO APP
+COMPLETE SETUP GUIDE (Step by Step — Do Not Skip Any Step)
+================================================================
+
+
+================================================================
+STEP 1 — INSTALL PYTHON
+================================================================
+
+1. Go to: https://python.org/downloads
+2. Download Python 3.11 or higher
+3. During install → CHECK "Add Python to PATH" (very important)
+4. Click Install Now
+5. Verify in terminal:
+     python --version
+   Expected output: Python 3.11.x
+
+
+================================================================
+STEP 2 — INSTALL GIT
+================================================================
+
+1. Go to: https://git-scm.com/downloads
+2. Download and install Git for Windows
+3. Verify:
+     git --version
+   Expected output: git version 2.x.x
+
+
+================================================================
+STEP 3 — OPEN TERMINAL IN PROJECT FOLDER
+================================================================
+
+1. Open File Explorer
+2. Navigate to: D:\Portfolio\Portfolio\portfolio_app
+3. Right-click inside the folder → "Open in Terminal"
+   OR open any terminal and run:
+     cd D:\Portfolio\Portfolio\portfolio_app
+
+All commands from Step 4 onwards must be run inside this folder.
+
+
+================================================================
+STEP 4 — CREATE VIRTUAL ENVIRONMENT
+================================================================
+
+Run:
+  python -m venv venv
+
+Activate it (Windows):
+  venv\Scripts\activate
+
+You should see (venv) at the start of your terminal line.
+This keeps your project packages separate from your system Python.
+
+
+================================================================
+STEP 5 — INSTALL DEPENDENCIES
+================================================================
+
+With venv activated, run:
+  pip install -r requirements.txt
+
+This installs:
+  - Flask          (web framework)
+  - supabase       (database client)
+  - python-dotenv  (reads .env file)
+  - flask-login    (session management)
+  - Werkzeug       (Flask utilities)
+  - requests       (HTTP calls)
+  - reportlab      (PDF generation)
+  - pillow         (image processing)
+
+Wait for all packages to finish installing.
+
+
+================================================================
+STEP 6 — SET UP SUPABASE DATABASE (TABLES)
+================================================================
+
+1. Go to: https://supabase.com
+2. Sign in to your account
+3. Open your project (the one matching your .env credentials)
+4. In the left sidebar → click "SQL Editor"
+5. Click "New Query" (top right)
+6. Open the file: D:\Portfolio\Portfolio\portfolio_app\supabase_schema.sql
+7. Copy ALL the content (Ctrl+A, Ctrl+C)
+8. Paste it into the Supabase SQL Editor
+9. Click the green "Run" button
+10. You should see: "Success. No rows returned"
+
+This creates all 14 tables in your database.
+
+
+================================================================
+STEP 7 — INSERT YOUR PERSON RECORD AND GET UUID
+================================================================
+
+In Supabase SQL Editor, run this query:
+
+  SELECT id, name FROM persons LIMIT 1;
+
+Copy the UUID value shown (looks like: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)
+
+This UUID is your person_id. You need it for all the inserts below.
+
+
+================================================================
+STEP 8 — INSERT ALL YOUR DATA
+================================================================
+
+In Supabase SQL Editor, run each block below.
+Replace <YOUR_UUID> with the UUID you copied in Step 7.
+
+---- EMAIL ----
+INSERT INTO emails (person_id, email) VALUES
+  ('<YOUR_UUID>', 'santoshravi.san.2004@gmail.com');
+
+---- SOCIAL LINKS ----
+INSERT INTO social_links (person_id, platform, url) VALUES
+  ('<YOUR_UUID>', 'github',     'https://github.com/SANTOSH-TECH7'),
+  ('<YOUR_UUID>', 'linkedin',   'https://www.linkedin.com/in/santosh-ravi1804'),
+  ('<YOUR_UUID>', 'leetcode',   'https://leetcode.com/u/Santosh_R/'),
+  ('<YOUR_UUID>', 'hackerrank', 'https://www.hackerrank.com/profile/santosh88386r');
+
+---- SKILL CATEGORIES ----
+Run each one separately and copy the returned UUID:
+
+  INSERT INTO skill_categories (name) VALUES ('Programming Languages') RETURNING id;
+  -- Copy UUID → <PROG_UUID>
+
+  INSERT INTO skill_categories (name) VALUES ('AI & Machine Learning') RETURNING id;
+  -- Copy UUID → <AI_UUID>
+
+  INSERT INTO skill_categories (name) VALUES ('Frameworks & Tools') RETURNING id;
+  -- Copy UUID → <FW_UUID>
+
+  INSERT INTO skill_categories (name) VALUES ('Databases & Cloud') RETURNING id;
+  -- Copy UUID → <DB_UUID>
+
+---- SKILLS (replace each <CAT_UUID> with the matching category UUID) ----
+
+  INSERT INTO skills (category_id, name, percentage) VALUES
+    ('<PROG_UUID>', 'Python',     95),
+    ('<PROG_UUID>', 'JavaScript', 85),
+    ('<PROG_UUID>', 'HTML & CSS', 90),
+    ('<PROG_UUID>', 'Java',       75);
+
+  INSERT INTO skills (category_id, name, percentage) VALUES
+    ('<AI_UUID>', 'Machine Learning', 90),
+    ('<AI_UUID>', 'TensorFlow',       85),
+    ('<AI_UUID>', 'OpenCV',           85),
+    ('<AI_UUID>', 'Scikit-Learn',     88);
+
+  INSERT INTO skills (category_id, name, percentage) VALUES
+    ('<FW_UUID>', 'Flask',    80),
+    ('<FW_UUID>', 'Django',   75),
+    ('<FW_UUID>', 'Selenium', 88),
+    ('<FW_UUID>', 'Tkinter',  80);
+
+  INSERT INTO skills (category_id, name, percentage) VALUES
+    ('<DB_UUID>', 'SQL',    82),
+    ('<DB_UUID>', 'Docker', 70),
+    ('<DB_UUID>', 'AWS',    68);
+
+---- PROJECTS ----
+Run each INSERT ... RETURNING id; separately and copy each project UUID.
+
+  INSERT INTO projects (person_id, title, description, category, github_url, image_url) VALUES
+  ('<YOUR_UUID>',
+   'CodeFixPro',
+   'An AI-driven tool for automatically detecting and suggesting fixes for coding errors. Built using Python and ML models to help developers quickly debug code.',
+   'AI / NLP',
+   'https://github.com/SANTOSH-TECH7/CodeFixPro',
+   'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQWbqm_Px5A3wFEABLUwVYQMhOQpY04juKxZQ&s')
+  RETURNING id;
+  -- Copy UUID → <P1>
+  INSERT INTO project_tools (project_id, name) VALUES
+    ('<P1>','Python'),('<P1>','Machine Learning'),('<P1>','NLP'),('<P1>','Code Analysis');
+
+  INSERT INTO projects (person_id, title, description, category, github_url, image_url) VALUES
+  ('<YOUR_UUID>',
+   'LinkedIn_Bot',
+   'A Python automation bot for LinkedIn using Selenium, capable of connecting with professionals and sending personalized messages at scale.',
+   'Automation',
+   'https://github.com/SANTOSH-TECH7/LinkedIn_Bot',
+   'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0YJYgYDXqgC1tLVuC2sxcLtJ4B8RAlq48cw&s')
+  RETURNING id;
+  -- Copy UUID → <P2>
+  INSERT INTO project_tools (project_id, name) VALUES
+    ('<P2>','Python'),('<P2>','Selenium'),('<P2>','Web Automation');
+
+  INSERT INTO projects (person_id, title, description, category, github_url, image_url) VALUES
+  ('<YOUR_UUID>',
+   'EPILEPSY-MODEL-TRAINING',
+   'Deep learning project to detect epileptic seizures using EEG data. Involves model optimization and real-time application potential.',
+   'Deep Learning / Medical AI',
+   'https://github.com/SANTOSH-TECH7/EPILEPSY-MODEL-TRAINING',
+   'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSctEjU0e8sap3V4HSAZEqUWAKJv8KsKYMadQ&s')
+  RETURNING id;
+  -- Copy UUID → <P3>
+  INSERT INTO project_tools (project_id, name) VALUES
+    ('<P3>','Deep Learning'),('<P3>','TensorFlow'),('<P3>','EEG Analysis');
+
+  INSERT INTO projects (person_id, title, description, category, github_url, image_url) VALUES
+  ('<YOUR_UUID>',
+   'Smart-Attendance-System',
+   'Face recognition-based attendance system using OpenCV and ML that marks attendance efficiently, eliminating manual entry.',
+   'Computer Vision',
+   'https://github.com/SANTOSH-TECH7/Smart-Attendance-System-Using-Face-Recognition',
+   'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSYsMgskvvvZMr652FOav3kNJ1mch8kWtmnuA&s')
+  RETURNING id;
+  -- Copy UUID → <P4>
+  INSERT INTO project_tools (project_id, name) VALUES
+    ('<P4>','OpenCV'),('<P4>','Python'),('<P4>','Face Recognition');
+
+  INSERT INTO projects (person_id, title, description, category, github_url, image_url) VALUES
+  ('<YOUR_UUID>',
+   'Heart_Disease_Prediction',
+   'ML model using logistic regression to predict heart disease likelihood from health indicators.',
+   'ML / Healthcare',
+   'https://github.com/SANTOSH-TECH7/Heart_Disease_Prediction-using-LogisticRegression',
+   'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRWeuNWMaZIyEI82lzg003P5Qw5MOVPmO14Ew&s')
+  RETURNING id;
+  -- Copy UUID → <P5>
+  INSERT INTO project_tools (project_id, name) VALUES
+    ('<P5>','Logistic Regression'),('<P5>','Scikit-Learn'),('<P5>','Data Analysis');
+
+  INSERT INTO projects (person_id, title, description, category, github_url, image_url) VALUES
+  ('<YOUR_UUID>',
+   'Task-Remainder-Automation',
+   'Python automation script that reminds users of tasks at specified intervals using Tkinter and voice alerts.',
+   'Automation',
+   'https://github.com/SANTOSH-TECH7/Task-Remainder-Automation',
+   'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQSmwx1n8p2ta1F_8eYt26NTgeNuWuISNqa3w&s')
+  RETURNING id;
+  -- Copy UUID → <P6>
+  INSERT INTO project_tools (project_id, name) VALUES
+    ('<P6>','Python'),('<P6>','Tkinter'),('<P6>','Automation');
+
+  INSERT INTO projects (person_id, title, description, category, github_url, image_url) VALUES
+  ('<YOUR_UUID>',
+   'Water_app',
+   'Water usage chatbot that calculates water footprints (blue, green, grey) based on user inputs with fuzzy matching.',
+   'Web / AI',
+   'https://github.com/SANTOSH-TECH7/Water_app',
+   'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRuTxTo4kuaUSxosEnPYIKQSDeylxFFduiTWg&s')
+  RETURNING id;
+  -- Copy UUID → <P7>
+  INSERT INTO project_tools (project_id, name) VALUES
+    ('<P7>','Python'),('<P7>','ChatBot'),('<P7>','Fuzzy Matching'),('<P7>','Web Integration');
+
+---- ACHIEVEMENTS ----
+  INSERT INTO achievements (person_id, title, subtitle, description, icon, display_order) VALUES
+  ('<YOUR_UUID>', 'MSME National Competition', 'Shortlisted in Top 25 Teams',
+   'Recognized for innovative solutions in Sustainable Management and Development in Water FootPrint.',
+   'fas fa-trophy', 1),
+  ('<YOUR_UUID>', 'Kongu Engineering College', '1st & 2nd Prize',
+   'Won prizes for AI-Powered Seizure Detection and Sustainable Fashion AI Solutions projects.',
+   'fas fa-medal', 2),
+  ('<YOUR_UUID>', 'Hands-On-Training', 'LABView Tool & Its Applications',
+   'Completed comprehensive training at PSG Engineering College.',
+   'fas fa-certificate', 3);
+
+---- CERTIFICATIONS ----
+  INSERT INTO certifications (person_id, name, platform, start_date) VALUES
+  ('<YOUR_UUID>', 'Internship on AI', 'Novi Tech R&D Private Limited', '2023-01-01'),
+  ('<YOUR_UUID>', 'Gemini AI Jarvis Workshop', 'LetsUpgrade', '2024-01-01');
+
+---- EDUCATION ----
+  INSERT INTO education (person_id, degree, institution, place, status, sort_order) VALUES
+  ('<YOUR_UUID>',
+   'B.Tech in Artificial Intelligence & Data Science',
+   'V.S.B Engineering College',
+   'Karur, Tamil Nadu',
+   'Currently Pursuing',
+   1);
+
+---- SOFT SKILLS ----
+  INSERT INTO soft_skills (person_id, name) VALUES
+  ('<YOUR_UUID>', 'Problem Solving'),
+  ('<YOUR_UUID>', 'Team Collaboration'),
+  ('<YOUR_UUID>', 'Analytical Thinking'),
+  ('<YOUR_UUID>', 'Communication'),
+  ('<YOUR_UUID>', 'Adaptability'),
+  ('<YOUR_UUID>', 'Leadership');
+
+
+================================================================
+STEP 9 — CREATE SUPABASE AUTH USER (Admin Login)
+================================================================
+
+1. In Supabase dashboard → left sidebar → "Authentication"
+2. Click "Users" tab
+3. Click "Add User" → "Create new user"
+4. Email   : santoshravi.san.2004@gmail.com
+5. Password: (choose a strong password — remember it!)
+6. Click "Create User"
+
+This is the only account that can log into /dashboard.
+
+
+================================================================
+STEP 10 — VERIFY YOUR .env FILE
+================================================================
+
+Open: D:\Portfolio\Portfolio\portfolio_app\.env
+
+It should contain:
+  SUPABASE_URL=https://ftvrlokh gagmhczeqtm.supabase.co
+  SUPABASE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+  SECRET_KEY=a3f9c2e1b4d6f7a0e2c5b7d9f1a3e5c7b9d1f3a5c7e9b1d3f5a7c9e1b3d5f7a
+  ADMIN_EMAIL=santoshravi.san.2004@gmail.com
+
+NOTE: The SUPABASE_URL must have no spaces. If there is a space
+in "ftvrlokh gagmhczeqtm", remove it:
+  SUPABASE_URL=https://ftvrlokh gagmhczeqtm.supabase.co
+  → should be: https://ftvrlokh gagmhczeqtm.supabase.co
+  (check your Supabase project Settings → API → Project URL)
+
+
+================================================================
+STEP 11 — ADD YOUR PROFILE PHOTO (Optional)
+================================================================
+
+Option A — Via URL (recommended):
+  1. Upload your photo to Imgur (https://imgur.com) or any image host
+  2. Copy the direct image URL (ends in .jpg or .png)
+  3. Go to /login → /dashboard → Edit Profile
+  4. Paste the URL in "Profile Image URL" field
+  5. Save — your photo appears instantly
+
+Option B — Local file:
+  1. Place your photo at:
+       D:\Portfolio\Portfolio\portfolio_app\static\images\profile.jpeg
+  2. Name it exactly: profile.jpeg
+  3. It will be used as fallback when no URL is set
+
+
+================================================================
+STEP 12 — RUN THE APP LOCALLY
+================================================================
+
+In terminal (with venv activated, inside portfolio_app folder):
+  python app.py
+
+You should see:
+  * Running on http://127.0.0.1:5000
+
+Open your browser and go to:
+  http://127.0.0.1:5000
+
+You should see your full portfolio homepage with all your data.
+
+
+================================================================
+STEP 13 — TEST ADMIN LOGIN
+================================================================
+
+1. Go to: http://127.0.0.1:5000/login
+2. Email   : santoshravi.san.2004@gmail.com
+3. Password: (the one you set in Step 9)
+4. You should be redirected to /dashboard
+5. Test adding a project, skill, achievement, etc.
+6. Go back to / and verify the changes appear live
+
+
+================================================================
+STEP 14 — PUSH TO GITHUB
+================================================================
+
+1. Create a new repo on github.com
+   - Name: santosh-portfolio (or any name)
+   - Set to: Public
+   - Do NOT initialize with README
+
+2. In terminal (inside portfolio_app folder):
+     git init
+     git add .
+     git commit -m "Initial portfolio app"
+     git branch -M main
+     git remote add origin https://github.com/SANTOSH-TECH7/<repo-name>.git
+     git push -u origin main
+
+   NOTE: .env is in .gitignore — your keys are safe and will NOT
+   be pushed to GitHub.
+
+
+================================================================
+STEP 15 — DEPLOY TO RENDER (Free Hosting)
+================================================================
+
+1. Go to: https://render.com
+2. Sign up with your GitHub account (free)
+3. Click "New +" → "Web Service"
+4. Connect your GitHub account if not already connected
+5. Select your portfolio repository
+6. Fill in the settings:
+     Name          : santosh-portfolio
+     Environment   : Python 3
+     Build Command : pip install -r requirements.txt
+     Start Command : python app.py
+7. Click "Advanced" → "Add Environment Variable"
+   Add these one by one (copy from your .env file):
+     SUPABASE_URL  = https://ftvrlokh gagmhczeqtm.supabase.co
+     SUPABASE_KEY  = (your anon key)
+     SECRET_KEY    = (your secret key)
+     ADMIN_EMAIL   = santoshravi.san.2004@gmail.com
+8. Click "Create Web Service"
+9. Wait 3–5 minutes for the first deployment
+10. Render gives you a live URL like:
+      https://santosh-portfolio.onrender.com
+
+
+================================================================
+STEP 16 — SHARE YOUR LIVE URL
+================================================================
+
+1. Copy your Render URL
+2. Add it to your GitHub profile README
+3. Add it to your LinkedIn profile → Featured section
+4. Add it to your resume as: Portfolio: <url>
+5. Share on LinkedIn as a post
+
+
+================================================================
+TROUBLESHOOTING
+================================================================
+
+Problem: "ModuleNotFoundError: No module named 'supabase'"
+Fix    : Make sure venv is activated. Run: pip install -r requirements.txt
+
+Problem: "Invalid credentials" on login
+Fix    : Make sure you created the Auth user in Supabase (Step 9)
+         and are using the exact same email and password.
+
+Problem: Portfolio page loads but shows no data
+Fix    : Check that you ran all the INSERT statements in Step 8.
+         In Supabase → Table Editor → check if tables have rows.
+
+Problem: "SUPABASE_URL is None"
+Fix    : Check your .env file exists in the portfolio_app folder
+         and has no spaces in the URL value.
+
+Problem: Profile image not showing
+Fix    : Make sure the URL is a direct image link (ends in .jpg/.png).
+         Test it by pasting the URL directly in your browser.
+
+================================================================
+END OF SETUP GUIDE
+================================================================

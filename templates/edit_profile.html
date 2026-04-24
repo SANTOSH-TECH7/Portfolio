@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Edit Profile</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@400;500&display=swap" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet"/>
+</head>
+<body>
+<div class="container py-5" style="max-width:720px;">
+  <a href="/dashboard" class="btn btn-sm btn-outline-light mb-4">← Dashboard</a>
+  <div class="glass-card p-4">
+    <h4 class="gradient-text fw-bold mb-4">Edit Profile</h4>
+    <form method="POST">
+      <div class="mb-3">
+        <label class="form-label small" style="color:var(--text-muted)">Full Name</label>
+        <input type="text" name="name" class="form-control dark-input" value="{{ person.name }}" required/>
+      </div>
+      <div class="mb-3">
+        <label class="form-label small" style="color:var(--text-muted)">Phone</label>
+        <input type="text" name="phone" class="form-control dark-input" value="{{ person.phone or '' }}"/>
+      </div>
+      <div class="mb-3">
+        <label class="form-label small" style="color:var(--text-muted)">Role / Title</label>
+        <input type="text" name="role" class="form-control dark-input" value="{{ person.role or '' }}"/>
+      </div>
+      <div class="mb-3">
+        <label class="form-label small" style="color:var(--text-muted)">Age</label>
+        <input type="number" name="age" class="form-control dark-input" value="{{ person.age or '' }}"/>
+      </div>
+      <div class="mb-3">
+        <label class="form-label small" style="color:var(--text-muted)">Profile Image URL</label>
+        <input type="url" name="profile_image_url" id="imgUrl" class="form-control dark-input" value="{{ person.profile_image_url or '' }}" placeholder="https://..."/>
+        <div class="mt-2" id="imgPreview" style="display:none;">
+          <img id="previewImg" src="" alt="Preview" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid var(--primary);"/>
+        </div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label small" style="color:var(--text-muted)">Summary</label>
+        <textarea name="summary" class="form-control dark-input" rows="4">{{ person.summary or '' }}</textarea>
+      </div>
+      <div class="mb-3">
+        <label class="form-label small" style="color:var(--text-muted)">GitHub URL</label>
+        <input type="url" name="github" class="form-control dark-input" value="{{ socials.github or '' }}"/>
+      </div>
+      <div class="mb-3">
+        <label class="form-label small" style="color:var(--text-muted)">LinkedIn URL</label>
+        <input type="url" name="linkedin" class="form-control dark-input" value="{{ socials.linkedin or '' }}"/>
+      </div>
+      <div class="mb-3">
+        <label class="form-label small" style="color:var(--text-muted)">LeetCode URL</label>
+        <input type="url" name="leetcode" class="form-control dark-input" value="{{ socials.leetcode or '' }}"/>
+      </div>
+      <div class="mb-4">
+        <label class="form-label small" style="color:var(--text-muted)">HackerRank URL</label>
+        <input type="url" name="hackerrank" class="form-control dark-input" value="{{ socials.hackerrank or '' }}"/>
+      </div>
+      <button type="submit" class="btn btn-glow w-100">Save Changes</button>
+    </form>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  const imgUrl = document.getElementById('imgUrl');
+  const preview = document.getElementById('imgPreview');
+  const previewImg = document.getElementById('previewImg');
+  function updatePreview() {
+    const val = imgUrl.value.trim();
+    if (val) { previewImg.src = val; preview.style.display = 'block'; }
+    else { preview.style.display = 'none'; }
+  }
+  imgUrl.addEventListener('input', updatePreview);
+  updatePreview();
+</script>
+</body>
+</html>

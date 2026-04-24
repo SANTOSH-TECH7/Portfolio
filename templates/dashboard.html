@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@400;500&display=swap" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet"/>
+  <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet"/>
+</head>
+<body>
+<nav class="navbar glass-nav px-4 py-3">
+  <span class="navbar-brand gradient-text fw-bold" style="font-family:'Orbitron',sans-serif;">Admin Dashboard</span>
+  <div class="d-flex gap-3">
+    <a href="/" class="btn btn-sm btn-outline-light">View Site</a>
+    <a href="/logout" class="btn btn-sm btn-outline-danger">Logout</a>
+  </div>
+</nav>
+
+<div class="container py-5">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}
+    <div class="alert alert-{{ cat }} py-2 small">{{ msg }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  <!-- QUICK ACTIONS -->
+  <div class="row g-3 mb-5">
+    {% for label, icon, href in [('Add Project','fa-plus-circle','/add-project'),('Add Skill','fa-tools','/add-skill'),('Edit Profile','fa-user-edit','/edit-profile'),('Add Cert','fa-certificate','/add-certification'),('Experience','fa-briefcase','/manage-experience'),('Add Education','fa-graduation-cap','/add-education'),('Add Achievement','fa-trophy','/add-achievement')] %}
+    <div class="col-6 col-md-3">
+      <a href="{{ href }}" class="glass-card p-3 text-center d-block text-decoration-none">
+        <i class="fas {{ icon }} fa-2x gradient-text mb-2"></i>
+        <p style="color:var(--text-muted);font-size:0.8rem;" class="mb-0">{{ label }}</p>
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- PROJECTS -->
+  <div class="glass-card p-4 mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="fw-bold gradient-text mb-0">Projects</h5>
+      <a href="/add-project" class="btn btn-sm btn-glow">+ Add</a>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-dark table-hover align-middle">
+        <thead><tr><th>Title</th><th>Category</th><th>In Resume</th><th>Actions</th></tr></thead>
+        <tbody>
+          {% for p in projects %}
+          <tr>
+            <td>{{ p.title }}</td>
+            <td><span class="badge-category">{{ p.category }}</span></td>
+            <td>
+              {% if p.include_in_resume != false %}
+                <a href="/toggle-resume-project/{{ p.id }}" class="badge bg-success text-decoration-none">✓ In Resume</a>
+              {% else %}
+                <a href="/toggle-resume-project/{{ p.id }}" class="badge bg-secondary text-decoration-none">✗ Excluded</a>
+              {% endif %}
+            </td>
+            <td>
+              <a href="/edit-project/{{ p.id }}" class="btn btn-sm btn-outline-primary me-1">Edit</a>
+              <a href="/delete-project/{{ p.id }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete?')">Delete</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SKILLS -->
+  <div class="glass-card p-4 mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="fw-bold gradient-text mb-0">Skills</h5>
+      <a href="/add-skill" class="btn btn-sm btn-glow">+ Add</a>
+    </div>
+    {% for cat in skills %}
+    <p style="color:var(--accent);font-weight:600;" class="mb-2">{{ cat.name }}</p>
+    <div class="d-flex flex-wrap gap-2 mb-3">
+      {% for s in cat.skills %}
+      <span class="tech-tag">{{ s.name }} ({{ s.percentage }}%)
+        <a href="/delete-skill/{{ s.id }}" class="text-danger ms-1" onclick="return confirm('Delete?')">×</a>
+      </span>
+      {% endfor %}
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- ACHIEVEMENTS -->
+  <div class="glass-card p-4 mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="fw-bold gradient-text mb-0">Achievements</h5>
+      <a href="/add-achievement" class="btn btn-sm btn-glow">+ Add</a>
+    </div>
+    {% for a in achievements %}
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <span style="color:var(--text-muted);">{{ a.title }} — {{ a.subtitle }}</span>
+      <a href="/delete-achievement/{{ a.id }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete?')">Delete</a>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- CERTIFICATIONS -->
+  <div class="glass-card p-4 mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="fw-bold gradient-text mb-0">Certifications</h5>
+      <a href="/add-certification" class="btn btn-sm btn-glow">+ Add</a>
+    </div>
+    {% for c in certifications %}
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <span style="color:var(--text-muted);">{{ c.name }} — {{ c.platform }}</span>
+      <div class="d-flex gap-2">
+        {% if c.include_in_resume != false %}
+          <a href="/toggle-resume-certification/{{ c.id }}" class="badge bg-success text-decoration-none">✓ In Resume</a>
+        {% else %}
+          <a href="/toggle-resume-certification/{{ c.id }}" class="badge bg-secondary text-decoration-none">✗ Excluded</a>
+        {% endif %}
+        <a href="/delete-certification/{{ c.id }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete?')">Delete</a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- EDUCATION -->
+  <div class="glass-card p-4 mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="fw-bold gradient-text mb-0">Education</h5>
+      <a href="/add-education" class="btn btn-sm btn-glow">+ Add</a>
+    </div>
+    {% for e in education %}
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <span style="color:var(--text-muted);">{{ e.degree }} — {{ e.institution }}</span>
+      <a href="/delete-education/{{ e.id }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete?')">Delete</a>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- SOFT SKILLS -->
+  <div class="glass-card p-4 mb-4">
+    <h5 class="fw-bold gradient-text mb-3">Soft Skills</h5>
+    <div class="d-flex flex-wrap gap-2 mb-3">
+      {% for s in soft_skills %}
+      <span class="badge-soft">{{ s.name }}
+        <a href="/delete-soft-skill/{{ s.id }}" class="text-danger ms-1" onclick="return confirm('Delete?')">×</a>
+      </span>
+      {% endfor %}
+    </div>
+    <form method="POST" action="/add-soft-skill" class="d-flex gap-2">
+      <input type="text" name="name" class="form-control dark-input" placeholder="New soft skill" required/>
+      <button type="submit" class="btn btn-glow px-3">Add</button>
+    </form>
+  </div>
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
